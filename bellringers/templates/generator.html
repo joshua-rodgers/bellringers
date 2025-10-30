@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Generator - Bell Ringers{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🎰 Bell Ringer Generator</h1>
+    <p style="color: var(--text-light); margin-bottom: 2rem;">
+        Lock the slots you want to keep, spin the rest, and generate a unique CS warm-up!
+    </p>
+
+    <!-- Lock & Spin UI -->
+    <div class="generator-container">
+        <div class="slot-machine">
+            <!-- Topic Slot -->
+            <div class="slot" id="topicSlot">
+                <div class="slot-header">
+                    <span class="slot-label">📚 Topic</span>
+                    <button class="lock-btn" id="topicLock">🔓</button>
+                </div>
+                <select class="slot-select" id="topicSelect">
+                    {% for topic in topics %}
+                    <option value="{{ topic }}">{{ topic }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Format Slot -->
+            <div class="slot" id="formatSlot">
+                <div class="slot-header">
+                    <span class="slot-label">📝 Format</span>
+                    <button class="lock-btn" id="formatLock">🔓</button>
+                </div>
+                <select class="slot-select" id="formatSelect">
+                    {% for format in formats %}
+                    <option value="{{ format }}">{{ format }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Constraint Slot -->
+            <div class="slot" id="constraintSlot">
+                <div class="slot-header">
+                    <span class="slot-label">⚡ Constraint</span>
+                    <button class="lock-btn" id="constraintLock">🔓</button>
+                </div>
+                <select class="slot-select" id="constraintSelect">
+                    {% for constraint in constraints %}
+                    <option value="{{ constraint }}">{{ constraint }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="generate-controls">
+            <button class="btn btn-secondary" id="spinBtn">🎰 Spin Unlocked</button>
+            <button class="btn btn-primary" id="generateBtn">✨ Generate!</button>
+        </div>
+    </div>
+
+    <!-- Result Display -->
+    <div class="result-container" id="resultContainer">
+        <h2>Your Bell Ringer</h2>
+        <div class="result-content" id="resultContent"></div>
+
+        <div class="result-actions">
+            <button class="btn btn-primary" id="saveBtn" onclick="saveBellRinger()">💾 Save to My Binder</button>
+            <button class="btn btn-secondary" id="publishBtn" onclick="publishBellRinger()">🌍 Publish to Feed</button>
+            <button class="btn btn-primary" onclick="printBellRinger()">🖨️ Print</button>
+        </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="card" style="margin-top: 2rem;">
+        <h3>How to Use</h3>
+        <ol>
+            <li><strong>Lock</strong> any slot you want to keep (🔒)</li>
+            <li><strong>Spin</strong> to randomize unlocked slots</li>
+            <li><strong>Generate</strong> your bell ringer using AI</li>
+            <li><strong>Save</strong> to your private binder or <strong>Publish</strong> to share with others</li>
+        </ol>
+    </div>
+</div>
+{% endblock %}

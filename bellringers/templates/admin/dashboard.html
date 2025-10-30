@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Bell Ringers{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1>📊 Admin Dashboard</h1>
+        <a href="{{ url_for('admin.logout') }}" class="btn btn-danger btn-small">Logout</a>
+    </div>
+
+    <!-- Summary Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ summary['total_users'] }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ summary['total_bell_ringers'] }}</div>
+            <div class="stat-label">Total Bell Ringers</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ summary['public_bell_ringers'] }}</div>
+            <div class="stat-label">Public Bell Ringers</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: var(--accent-color);">{{ summary['pending_approvals'] }}</div>
+            <div class="stat-label">Pending Approvals</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ summary['total_api_requests'] }}</div>
+            <div class="stat-label">Total API Requests</div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div style="margin-bottom: 2rem;">
+        <a href="{{ url_for('admin.content') }}" class="btn btn-primary">
+            Manage Content & Approvals
+        </a>
+    </div>
+
+    <!-- User Activity Statistics -->
+    <div class="card">
+        <h2>User Activity Statistics</h2>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>User Handle</th>
+                        <th>Joined</th>
+                        <th>Last Active</th>
+                        <th>API Requests</th>
+                        <th>Saves</th>
+                        <th>Logins</th>
+                        <th>Binder Items</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in user_stats %}
+                    <tr>
+                        <td data-label="User Handle">{{ user['handle'] }}</td>
+                        <td data-label="Joined">{{ user['created_at'][:10] }}</td>
+                        <td data-label="Last Active">{{ user['last_active'][:10] }}</td>
+                        <td data-label="API Requests">{{ user['api_requests'] }}</td>
+                        <td data-label="Saves">{{ user['saves'] }}</td>
+                        <td data-label="Logins">{{ user['logins'] }}</td>
+                        <td data-label="Binder Items">{{ user['binder_items'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
