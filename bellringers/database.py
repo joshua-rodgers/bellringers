@@ -12,7 +12,7 @@ DB_PATH = os.path.join(os.path.dirname(__file__), 'bellringers.db')
 @contextmanager
 def get_db():
     """Context manager for database connections"""
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=10.0, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     try:
         yield conn
@@ -101,7 +101,7 @@ def create_user(handle):
         cursor = conn.cursor()
         try:
             cursor.execute('INSERT INTO users (handle) VALUES (?)', (handle,))
-            log_activity(handle, 'user_created', 'New user registered')
+            log_activity(handle, 'user_created', 'New user registered', cursor=cursor)
             return True
         except sqlite3.IntegrityError:
             return False
@@ -144,7 +144,7 @@ def save_bell_ringer(owner_handle, topic, format_type, constraint, content, is_p
         ''', (owner_handle, bell_ringer_id))
 
         action_type = 'publish' if is_public else 'save'
-        log_activity(owner_handle, action_type, f'Bell ringer created: {topic} - {format_type}')
+        log_activity(owner_handle, action_type, f'Bell ringer created: {topic} - {format_type}', cursor=cursor)
 
         return bell_ringer_id
 
@@ -209,18 +209,33 @@ def add_to_binder(user_handle, bell_ringer_id):
             WHERE id = ?
         ''', (bell_ringer_id,))
 
-        log_activity(user_handle, 'add_to_binder', f'Added bell ringer {bell_ringer_id} to binder')
+        log_activity(user_handle, 'add_to_binder', f'Added bell ringer {bell_ringer_id} to binder', cursor=cursor)
         return True
 
 
-def log_activity(user_handle, action_type, details=''):
-    """Log user activity for statistics"""
-    with get_db() as conn:
-        cursor = conn.cursor()
+def log_activity(user_handle, action_type, details='', cursor=None):
+    """Log user activity for statistics
+
+    Args:
+        user_handle: User's handle
+        action_type: Type of action performed
+        details: Additional details about the action
+        cursor: Optional database cursor to use (for nested transactions)
+    """
+    if cursor:
+        # Use the provided cursor (nested transaction)
         cursor.execute('''
             INSERT INTO activity_logs (user_handle, action_type, details)
             VALUES (?, ?, ?)
         ''', (user_handle, action_type, details))
+    else:
+        # Create new connection (standalone call)
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO activity_logs (user_handle, action_type, details)
+                VALUES (?, ?, ?)
+            ''', (user_handle, action_type, details))
 
 
 def get_pending_approvals():
