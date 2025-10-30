@@ -164,6 +164,11 @@ def register_routes(bp):
             'has_session': bool(session)
         })
 
+    @bp.route('/debug')
+    def debug_page():
+        """Debug page for testing session flow"""
+        return render_template('bellringers/debug_session.html')
+
     @bp.route('/feed')
     def feed():
         """The Feed page - public bell ringers"""
