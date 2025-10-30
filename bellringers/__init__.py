@@ -57,7 +57,7 @@ def create_blueprint():
     def check_session():
         """Ensure user session exists and update last active"""
         # Skip for static files and admin login
-        if request.endpoint and ('static' in request.endpoint or 'admin.login' in request.endpoint):
+        if request.endpoint and ('static' in request.endpoint or 'bellringers.admin.login' in request.endpoint):
             return
 
         # If user_handle in session, update last active
@@ -66,7 +66,7 @@ def create_blueprint():
             if db.user_exists(handle):
                 db.update_last_active(handle)
 
-    # Register context processor
+    # Register context processor - note: for blueprints it's app_context_processor
     @bp.app_context_processor
     def inject_user():
         """Make user handle available in all templates"""

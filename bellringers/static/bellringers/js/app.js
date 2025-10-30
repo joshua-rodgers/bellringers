@@ -24,23 +24,25 @@ function generateHandle() {
     return `${adj}-${noun}-${num}`;
 }
 
-function getUserHandle() {
+async function getUserHandle() {
     let handle = localStorage.getItem('user_handle');
     if (!handle) {
         handle = generateHandle();
         localStorage.setItem('user_handle', handle);
         // Register user on backend
-        fetch('/bellringers/api/register', {
+        await fetch('/bellringers/api/register', {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ handle: handle })
+            body: JSON.stringify({ handle: handle }),
+            credentials: 'include'
         });
     }
     return handle;
 }
 
-function displayUserHandle() {
-    const handle = getUserHandle();
+async function displayUserHandle() {
+    const handle = await getUserHandle();
     const displayElement = document.getElementById('userHandleDisplay');
     if (displayElement) {
         displayElement.textContent = `👤 ${handle}`;
@@ -121,6 +123,7 @@ async function spinSlots() {
     try {
         const response = await fetch('/bellringers/api/spin', {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ locked: lockedSlots })
         });
@@ -172,6 +175,7 @@ async function generateBellRinger() {
     try {
         const response = await fetch('/bellringers/api/generate', {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 topic: topic,
@@ -209,6 +213,7 @@ async function saveBellRinger() {
     try {
         const response = await fetch('/bellringers/api/save', {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(currentGeneration)
         });
@@ -238,6 +243,7 @@ async function publishBellRinger() {
     try {
         const response = await fetch('/bellringers/api/publish', {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(currentGeneration)
         });
@@ -297,7 +303,8 @@ async function addToBinder(bellRingerId, button) {
 
     try {
         const response = await fetch(`/bellringers/api/add-to-binder/${bellRingerId}`, {
-            method: 'POST'
+            method: 'POST',
+            credentials: 'include'
         });
 
         const data = await response.json();
@@ -329,6 +336,7 @@ async function adminLogin(event) {
     try {
         const response = await fetch('/bellringers/admin/login', {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
         });
@@ -352,7 +360,8 @@ async function approveBellRinger(bellRingerId, button) {
 
     try {
         const response = await fetch(`/bellringers/admin/api/approve/${bellRingerId}`, {
-            method: 'POST'
+            method: 'POST',
+            credentials: 'include'
         });
 
         const data = await response.json();
@@ -382,7 +391,8 @@ async function deleteBellRinger(bellRingerId, button) {
 
     try {
         const response = await fetch(`/bellringers/admin/api/delete/${bellRingerId}`, {
-            method: 'POST'
+            method: 'POST',
+            credentials: 'include'
         });
 
         const data = await response.json();
