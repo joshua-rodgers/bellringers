@@ -8,6 +8,8 @@ from . import database as db
 
 def create_admin_blueprint():
     """Create and configure the admin blueprint"""
+    # Note: template_folder is relative to the blueprint's location
+    # Since we're a sub-blueprint, we use parent's template_folder via full paths
     admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
     def require_admin():
