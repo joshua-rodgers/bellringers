@@ -146,11 +146,23 @@ def register_routes(bp):
         """My Binder page - user's private collection"""
         user_handle = session.get('user_handle')
 
+        print(f"Binder page - Session data: {dict(session)}")  # Debug logging
+
         if not user_handle:
-            return render_template('bellringers/binder.html', bell_ringers=[], error='No user session')
+            error_msg = 'No user session. Please reload the page to create a session.'
+            return render_template('bellringers/binder.html', bell_ringers=[], error=error_msg)
 
         bell_ringers = db.get_user_binder(user_handle)
         return render_template('bellringers/binder.html', bell_ringers=bell_ringers)
+
+    @bp.route('/api/debug/session')
+    def debug_session():
+        """Debug endpoint to check session state"""
+        return jsonify({
+            'session_data': dict(session),
+            'user_handle': session.get('user_handle'),
+            'has_session': bool(session)
+        })
 
     @bp.route('/feed')
     def feed():

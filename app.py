@@ -13,6 +13,13 @@ from bellringers.config import Config
 app = Flask(__name__)
 app.config.from_object(Config)
 
+# Ensure session cookies work properly
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
+app.config['SESSION_COOKIE_PATH'] = '/'  # Important: cookie must be available to entire domain
+app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 24 hours
+
 # Register the bellringers blueprint - all initialization happens here
 bellringers_bp = create_blueprint()
 app.register_blueprint(bellringers_bp)
