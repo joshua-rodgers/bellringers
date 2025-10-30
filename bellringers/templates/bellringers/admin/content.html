@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "bellringers/base.html" %}
 
 {% block title %}Content Management - Bell Ringers{% endblock %}
 
@@ -7,8 +7,8 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
         <h1>📝 Content Management</h1>
         <div>
-            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary btn-small">Back to Dashboard</a>
-            <a href="{{ url_for('admin.logout') }}" class="btn btn-danger btn-small">Logout</a>
+            <a href="{{ url_for('bellringers.admin.dashboard') }}" class="btn btn-primary btn-small">Back to Dashboard</a>
+            <a href="{{ url_for('bellringers.admin.logout') }}" class="btn btn-danger btn-small">Logout</a>
         </div>
     </div>
 

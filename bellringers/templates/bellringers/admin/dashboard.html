@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "bellringers/base.html" %}
 
 {% block title %}Admin Dashboard - Bell Ringers{% endblock %}
 
@@ -6,7 +6,7 @@
 <div class="container">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
         <h1>📊 Admin Dashboard</h1>
-        <a href="{{ url_for('admin.logout') }}" class="btn btn-danger btn-small">Logout</a>
+        <a href="{{ url_for('bellringers.admin.logout') }}" class="btn btn-danger btn-small">Logout</a>
     </div>
 
     <!-- Summary Statistics -->
@@ -35,7 +35,7 @@
 
     <!-- Quick Links -->
     <div style="margin-bottom: 2rem;">
-        <a href="{{ url_for('admin.content') }}" class="btn btn-primary">
+        <a href="{{ url_for('bellringers.admin.content') }}" class="btn btn-primary">
             Manage Content & Approvals
         </a>
     </div>

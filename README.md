@@ -54,7 +54,9 @@ This will create the database and an admin user with the credentials from your e
 python app.py
 ```
 
-The app will be available at `http://localhost:5000`
+The app will be available at:
+- Main app: `http://localhost:5000/bellringers/`
+- Admin login: `http://localhost:5000/bellringers/admin/login`
 
 ## PythonAnywhere Deployment
 
@@ -123,9 +125,32 @@ Click "Reload" in the PythonAnywhere web app dashboard.
 3. Click "Create API Key"
 4. Copy the key and set it as `GEMINI_API_KEY`
 
+## Blueprint Structure
+
+This application is built as a self-contained Flask blueprint with the URL prefix `/bellringers`. This means:
+- All routes are prefixed with `/bellringers/`
+- Templates and static files are organized in subdirectories to avoid conflicts
+- The entire app can be registered alongside other blueprints in a larger Flask application
+
+**Example integration:**
+```python
+from flask import Flask
+from bellringers import create_blueprint
+
+app = Flask(__name__)
+app.config.from_object(Config)
+
+# Register the bellringers blueprint
+bellringers_bp = create_blueprint()
+app.register_blueprint(bellringers_bp)
+
+# You can register other blueprints here
+# app.register_blueprint(other_blueprint)
+```
+
 ## Admin Access
 
-- **URL**: `/admin/login`
+- **URL**: `/bellringers/admin/login`
 - **Default Username**: `admin` (or from `ADMIN_USERNAME` env var)
 - **Default Password**: Set via `ADMIN_PASSWORD` env var
 - **IMPORTANT**: Change the default password after first login!
@@ -140,31 +165,33 @@ Click "Reload" in the PythonAnywhere web app dashboard.
 
 ```
 bellringers/
-├── app.py                      # Main Flask application
+├── app.py                      # Simple test file (registers blueprint)
 ├── requirements.txt            # Python dependencies
 ├── bellringers/                # Blueprint package
-│   ├── __init__.py            # Blueprint initialization
+│   ├── __init__.py            # Blueprint factory (create_blueprint)
 │   ├── config.py              # Configuration settings
 │   ├── database.py            # SQLite3 database functions
 │   ├── init_db.py             # Database initialization script
-│   ├── routes.py              # Main application routes
-│   ├── admin_routes.py        # Admin routes
+│   ├── routes.py              # Main application routes (register_routes)
+│   ├── admin_routes.py        # Admin routes (create_admin_blueprint)
 │   ├── gemini_api.py          # Gemini API integration
 │   ├── static/
-│   │   ├── css/
-│   │   │   └── style.css      # Mobile-first stylesheet
-│   │   └── js/
-│   │       └── app.js         # Frontend JavaScript
+│   │   └── bellringers/       # Blueprint-namespaced static files
+│   │       ├── css/
+│   │       │   └── style.css  # Mobile-first stylesheet
+│   │       └── js/
+│   │           └── app.js     # Frontend JavaScript
 │   ├── templates/
-│   │   ├── base.html          # Base template
-│   │   ├── generator.html     # Lock & Spin UI
-│   │   ├── binder.html        # My Binder page
-│   │   ├── feed.html          # The Feed page
-│   │   ├── print.html         # Print-optimized view
-│   │   └── admin/
-│   │       ├── login.html     # Admin login
-│   │       ├── dashboard.html # Admin dashboard
-│   │       └── content.html   # Content management
+│   │   └── bellringers/       # Blueprint-namespaced templates
+│   │       ├── base.html      # Base template
+│   │       ├── generator.html # Lock & Spin UI
+│   │       ├── binder.html    # My Binder page
+│   │       ├── feed.html      # The Feed page
+│   │       ├── print.html     # Print-optimized view
+│   │       └── admin/
+│   │           ├── login.html     # Admin login
+│   │           ├── dashboard.html # Admin dashboard
+│   │           └── content.html   # Content management
 │   └── bellringers.db         # SQLite database (created on init)
 ```
 
@@ -187,7 +214,7 @@ bellringers/
 
 ### For Admins
 
-1. **Login**: Go to `/admin/login`
+1. **Login**: Go to `/bellringers/admin/login`
 
 2. **Dashboard**: View overall statistics and user activity
 

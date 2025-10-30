@@ -30,7 +30,7 @@ function getUserHandle() {
         handle = generateHandle();
         localStorage.setItem('user_handle', handle);
         // Register user on backend
-        fetch('/api/register', {
+        fetch('/bellringers/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ handle: handle })
@@ -119,7 +119,7 @@ async function spinSlots() {
     });
 
     try {
-        const response = await fetch('/api/spin', {
+        const response = await fetch('/bellringers/api/spin', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ locked: lockedSlots })
@@ -170,7 +170,7 @@ async function generateBellRinger() {
     const constraint = document.getElementById('constraintSelect').value;
 
     try {
-        const response = await fetch('/api/generate', {
+        const response = await fetch('/bellringers/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -207,7 +207,7 @@ async function saveBellRinger() {
     saveBtn.disabled = true;
 
     try {
-        const response = await fetch('/api/save', {
+        const response = await fetch('/bellringers/api/save', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(currentGeneration)
@@ -236,7 +236,7 @@ async function publishBellRinger() {
     publishBtn.disabled = true;
 
     try {
-        const response = await fetch('/api/publish', {
+        const response = await fetch('/bellringers/api/publish', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(currentGeneration)
@@ -296,7 +296,7 @@ async function addToBinder(bellRingerId, button) {
     button.textContent = 'Adding...';
 
     try {
-        const response = await fetch(`/api/add-to-binder/${bellRingerId}`, {
+        const response = await fetch(`/bellringers/api/add-to-binder/${bellRingerId}`, {
             method: 'POST'
         });
 
@@ -327,7 +327,7 @@ async function adminLogin(event) {
     const password = document.getElementById('adminPassword').value;
 
     try {
-        const response = await fetch('/admin/login', {
+        const response = await fetch('/bellringers/admin/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
@@ -351,7 +351,7 @@ async function approveBellRinger(bellRingerId, button) {
     button.disabled = true;
 
     try {
-        const response = await fetch(`/admin/api/approve/${bellRingerId}`, {
+        const response = await fetch(`/bellringers/admin/api/approve/${bellRingerId}`, {
             method: 'POST'
         });
 
@@ -381,7 +381,7 @@ async function deleteBellRinger(bellRingerId, button) {
     button.disabled = true;
 
     try {
-        const response = await fetch(`/admin/api/delete/${bellRingerId}`, {
+        const response = await fetch(`/bellringers/admin/api/delete/${bellRingerId}`, {
             method: 'POST'
         });
 

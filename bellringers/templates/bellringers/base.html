@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Bell Ringers - CS Warm-Up Generator{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('bellringers.static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('bellringers.static', filename='bellringers/css/style.css') }}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -24,7 +24,7 @@
                 <a href="{{ url_for('bellringers.index') }}" class="nav-link">Generate</a>
                 <a href="{{ url_for('bellringers.binder') }}" class="nav-link">My Binder</a>
                 <a href="{{ url_for('bellringers.feed') }}" class="nav-link">The Feed</a>
-                <a href="{{ url_for('admin.dashboard') }}" class="nav-link">Admin</a>
+                <a href="{{ url_for('bellringers.admin.dashboard') }}" class="nav-link">Admin</a>
                 <div class="user-handle" id="userHandleDisplay"></div>
             </div>
         </div>
@@ -38,7 +38,7 @@
         <p>&copy; 2025 Bell Ringers | Built for CS Teachers</p>
     </footer>
 
-    <script src="{{ url_for('bellringers.static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('bellringers.static', filename='bellringers/js/app.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

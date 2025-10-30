@@ -82,28 +82,30 @@ Click the big green "Reload" button
 
 ### 8. Test the Application
 
-Visit `https://<username>.pythonanywhere.com`
+Visit `https://<username>.pythonanywhere.com/bellringers/`
+
+**Important**: Note the `/bellringers/` URL prefix. All routes are under this prefix.
 
 ## Post-Deployment
 
 ### Test These Features
 
-1. **Generator Page** (`/`)
+1. **Generator Page** (`/bellringers/`)
    - [ ] Lock & Spin works
    - [ ] Generate creates bell ringers (requires valid GEMINI_API_KEY)
    - [ ] Save to binder works
    - [ ] Publish to feed works
 
-2. **My Binder** (`/binder`)
+2. **My Binder** (`/bellringers/binder`)
    - [ ] Shows saved bell ringers
    - [ ] Print view works
 
-3. **The Feed** (`/feed`)
+3. **The Feed** (`/bellringers/feed`)
    - [ ] Shows approved public bell ringers
    - [ ] Sorting works (New/Popular)
    - [ ] Add to binder works
 
-4. **Admin** (`/admin/login`)
+4. **Admin** (`/bellringers/admin/login`)
    - [ ] Login works with credentials
    - [ ] Dashboard shows statistics
    - [ ] Content management works
