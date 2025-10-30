@@ -37,6 +37,8 @@ def create_blueprint():
     @bp.route('/api/register', methods=['POST'])
     def register_user():
         """Register a new anonymous user handle"""
+        from flask import make_response
+
         data = request.get_json()
         handle = data.get('handle')
 
@@ -47,10 +49,16 @@ def create_blueprint():
         if not db.user_exists(handle):
             db.create_user(handle)
 
-        # Set session
+        # Set session - mark as permanent so it persists
+        session.permanent = True
         session['user_handle'] = handle
+        session.modified = True
 
-        return jsonify({'success': True})
+        print(f"Session set for user: {handle}")  # Debug logging
+        print(f"Session contents: {dict(session)}")  # Debug logging
+
+        response = make_response(jsonify({'success': True, 'handle': handle}))
+        return response
 
     # Register before_request handler
     @bp.before_request

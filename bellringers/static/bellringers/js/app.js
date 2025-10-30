@@ -29,14 +29,25 @@ async function getUserHandle() {
     if (!handle) {
         handle = generateHandle();
         localStorage.setItem('user_handle', handle);
+        console.log('Registering new user:', handle);
         // Register user on backend
-        await fetch('/bellringers/api/register', {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ handle: handle }),
-            credentials: 'include'
-        });
+        try {
+            const response = await fetch('/bellringers/api/register', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ handle: handle })
+            });
+            const data = await response.json();
+            console.log('Registration response:', data);
+            if (!data.success) {
+                console.error('Registration failed:', data);
+            }
+        } catch (error) {
+            console.error('Registration error:', error);
+        }
+    } else {
+        console.log('Using existing handle:', handle);
     }
     return handle;
 }
@@ -431,8 +442,10 @@ function showAlert(message, type) {
 }
 
 // ===== Initialize on Page Load =====
-document.addEventListener('DOMContentLoaded', () => {
-    displayUserHandle();
+document.addEventListener('DOMContentLoaded', async () => {
+    // Ensure user is registered BEFORE doing anything else
+    await displayUserHandle();
+
     setupNavigation();
     setupGenerator();
 
