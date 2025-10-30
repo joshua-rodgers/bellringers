@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Debug - Bell Ringers</title>
+    <style>
+        body {
+            font-family: monospace;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4A90E2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover { background: #357ABD; }
+        .result {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>🔔 Bell Ringers - Session Debug Tool</h1>
+
+    <div class="test-section">
+        <h2>1. Check Current Session</h2>
+        <button onclick="checkSession()">Check Session</button>
+        <button onclick="checkCookies()">Check Cookies</button>
+        <button onclick="checkLocalStorage()">Check localStorage</button>
+        <div id="sessionResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Register New Session</h2>
+        <button onclick="registerSession()">Register/Create Session</button>
+        <div id="registerResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test API Endpoint</h2>
+        <button onclick="testGenerate()">Test /api/generate</button>
+        <div id="generateResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Clear Everything</h2>
+        <button onclick="clearEverything()">Clear localStorage & Cookies</button>
+        <div id="clearResult" class="result"></div>
+    </div>
+
+    <script>
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            element.innerHTML += `<div class="${type}">[${timestamp}] ${message}</div>`;
+        }
+
+        function clearLog(elementId) {
+            document.getElementById(elementId).innerHTML = '';
+        }
+
+        async function checkSession() {
+            clearLog('sessionResult');
+            log('sessionResult', 'Checking session...', 'info');
+
+            try {
+                const response = await fetch('/bellringers/api/debug/session', {
+                    credentials: 'include'
+                });
+
+                log('sessionResult', `Status: ${response.status}`, 'info');
+
+                const data = await response.json();
+                log('sessionResult', `Response: ${JSON.stringify(data, null, 2)}`, 'success');
+
+                if (data.user_handle) {
+                    log('sessionResult', `✅ Session exists with handle: ${data.user_handle}`, 'success');
+                } else {
+                    log('sessionResult', `❌ No session found`, 'error');
+                }
+            } catch (error) {
+                log('sessionResult', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        function checkCookies() {
+            clearLog('sessionResult');
+            const cookies = document.cookie.split(';').map(c => c.trim());
+            log('sessionResult', `Cookies found: ${cookies.length}`, 'info');
+            cookies.forEach(cookie => {
+                log('sessionResult', cookie, 'info');
+            });
+
+            const hasSession = cookies.some(c => c.startsWith('session='));
+            if (hasSession) {
+                log('sessionResult', '✅ Session cookie found', 'success');
+            } else {
+                log('sessionResult', '❌ No session cookie found', 'error');
+            }
+        }
+
+        function checkLocalStorage() {
+            clearLog('sessionResult');
+            const handle = localStorage.getItem('user_handle');
+            if (handle) {
+                log('sessionResult', `✅ localStorage has handle: ${handle}`, 'success');
+            } else {
+                log('sessionResult', '❌ No handle in localStorage', 'error');
+            }
+        }
+
+        async function registerSession() {
+            clearLog('registerResult');
+
+            let handle = localStorage.getItem('user_handle');
+            if (!handle) {
+                handle = 'debug-user-' + Math.floor(Math.random() * 1000);
+                localStorage.setItem('user_handle', handle);
+                log('registerResult', `Generated new handle: ${handle}`, 'info');
+            } else {
+                log('registerResult', `Using existing handle: ${handle}`, 'info');
+            }
+
+            log('registerResult', 'Calling /api/register...', 'info');
+
+            try {
+                const response = await fetch('/bellringers/api/register', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ handle: handle })
+                });
+
+                log('registerResult', `Status: ${response.status}`, 'info');
+
+                const data = await response.json();
+                log('registerResult', `Response: ${JSON.stringify(data, null, 2)}`, data.success ? 'success' : 'error');
+
+                if (data.success) {
+                    log('registerResult', '✅ Session created successfully!', 'success');
+
+                    // Check cookie was set
+                    setTimeout(() => {
+                        checkCookies();
+                    }, 100);
+                } else {
+                    log('registerResult', '❌ Registration failed', 'error');
+                }
+            } catch (error) {
+                log('registerResult', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGenerate() {
+            clearLog('generateResult');
+            log('generateResult', 'Testing /api/generate endpoint...', 'info');
+
+            try {
+                const response = await fetch('/bellringers/api/generate', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        topic: 'Variables',
+                        format: 'Debug the Code',
+                        constraint: '5-Minute Timer'
+                    })
+                });
+
+                log('generateResult', `Status: ${response.status}`, 'info');
+
+                if (response.status === 401) {
+                    log('generateResult', '❌ 401 Unauthorized - No session!', 'error');
+                    log('generateResult', 'Try "Register New Session" first', 'error');
+                } else if (response.status === 200) {
+                    const data = await response.json();
+                    log('generateResult', '✅ Request authorized!', 'success');
+                    if (data.success) {
+                        log('generateResult', 'Bell ringer generated successfully!', 'success');
+                    } else {
+                        log('generateResult', `Error: ${data.error}`, 'error');
+                    }
+                } else {
+                    log('generateResult', `Unexpected status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log('generateResult', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        function clearEverything() {
+            clearLog('clearResult');
+
+            // Clear localStorage
+            const handle = localStorage.getItem('user_handle');
+            localStorage.clear();
+            log('clearResult', `Cleared localStorage (had: ${handle || 'nothing'})`, 'info');
+
+            // Clear cookies (attempt)
+            document.cookie.split(";").forEach(function(c) {
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+            });
+            log('clearResult', 'Attempted to clear cookies', 'info');
+
+            log('clearResult', '✅ Everything cleared! Reload page to start fresh.', 'success');
+        }
+
+        // Auto-check on load
+        window.addEventListener('DOMContentLoaded', () => {
+            log('sessionResult', 'Page loaded. Click buttons above to test.', 'info');
+        });
+    </script>
+</body>
+</html>

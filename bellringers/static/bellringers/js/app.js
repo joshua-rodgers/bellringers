@@ -29,26 +29,39 @@ async function getUserHandle() {
     if (!handle) {
         handle = generateHandle();
         localStorage.setItem('user_handle', handle);
-        console.log('Registering new user:', handle);
-        // Register user on backend
-        try {
-            const response = await fetch('/bellringers/api/register', {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ handle: handle })
-            });
-            const data = await response.json();
-            console.log('Registration response:', data);
-            if (!data.success) {
-                console.error('Registration failed:', data);
-            }
-        } catch (error) {
-            console.error('Registration error:', error);
-        }
+        console.log('Generated new user handle:', handle);
     } else {
-        console.log('Using existing handle:', handle);
+        console.log('Found existing handle:', handle);
     }
+
+    // ALWAYS register/update session on backend, even if handle exists
+    // This ensures session is created if cookies were cleared
+    console.log('Registering session for:', handle);
+    try {
+        const response = await fetch('/bellringers/api/register', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ handle: handle })
+        });
+
+        if (!response.ok) {
+            console.error('Registration HTTP error:', response.status, response.statusText);
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Registration response:', data);
+
+        if (!data.success) {
+            console.error('Registration failed:', data);
+        } else {
+            console.log('Session created successfully!');
+        }
+    } catch (error) {
+        console.error('Registration error:', error);
+    }
+
     return handle;
 }
 
@@ -183,6 +196,8 @@ async function generateBellRinger() {
     const format = document.getElementById('formatSelect').value;
     const constraint = document.getElementById('constraintSelect').value;
 
+    console.log('Generating bell ringer:', { topic, format, constraint });
+
     try {
         const response = await fetch('/bellringers/api/generate', {
             method: 'POST',
@@ -195,7 +210,22 @@ async function generateBellRinger() {
             })
         });
 
+        console.log('Generate response status:', response.status);
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                const errorMsg = 'Session expired or not found. Reloading page to create new session...';
+                console.error(errorMsg);
+                alert(errorMsg);
+                // Reload page to re-establish session
+                setTimeout(() => location.reload(), 1000);
+                return;
+            }
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
         const data = await response.json();
+        console.log('Generate response data:', data);
 
         if (data.success) {
             currentGeneration = data;
@@ -203,12 +233,12 @@ async function generateBellRinger() {
             resultContainer.classList.add('active');
             resultContainer.scrollIntoView({ behavior: 'smooth' });
         } else {
-            alert('Error: ' + data.error);
+            alert('Error: ' + (data.error || 'Unknown error'));
         }
 
     } catch (error) {
         console.error('Generation error:', error);
-        alert('Error generating bell ringer');
+        alert('Error generating bell ringer: ' + error.message);
     } finally {
         generateBtn.disabled = false;
         generateBtn.textContent = '✨ Generate!';
