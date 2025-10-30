@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}My Binder - Bell Ringers{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>📚 My Binder</h1>
+    <p style="color: var(--text-light); margin-bottom: 2rem;">
+        Your personal collection of saved bell ringers
+    </p>
+
+    {% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+    {% endif %}
+
+    {% if bell_ringers %}
+    <div class="card-grid">
+        {% for br in bell_ringers %}
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ br['topic'] }}</h3>
+                <div class="card-meta">
+                    <span>{{ br['format'] }}</span>
+                    <span>{{ br['constraint_type'] }}</span>
+                </div>
+            </div>
+            <div class="card-content">
+                {{ br['content'][:200] }}...
+            </div>
+            <div class="card-actions">
+                <a href="{{ url_for('bellringers.print_view', bell_ringer_id=br['id']) }}" class="btn btn-primary btn-small" target="_blank">
+                    🖨️ Print
+                </a>
+                {% if br['is_public'] %}
+                <span class="btn btn-secondary btn-small" style="cursor: default;">
+                    {% if br['is_approved'] %}
+                    ✓ Published
+                    {% else %}
+                    ⏳ Pending Approval
+                    {% endif %}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card">
+        <p style="text-align: center; color: var(--text-light);">
+            Your binder is empty. Generate your first bell ringer!
+        </p>
+        <div style="text-align: center; margin-top: 1rem;">
+            <a href="{{ url_for('bellringers.index') }}" class="btn btn-primary">Go to Generator</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

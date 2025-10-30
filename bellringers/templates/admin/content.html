@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Content Management - Bell Ringers{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1>📝 Content Management</h1>
+        <div>
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary btn-small">Back to Dashboard</a>
+            <a href="{{ url_for('admin.logout') }}" class="btn btn-danger btn-small">Logout</a>
+        </div>
+    </div>
+
+    <!-- Pending Approvals -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <h2>⏳ Pending Approvals ({{ pending|length }})</h2>
+
+        {% if pending %}
+        <div class="card-grid">
+            {% for br in pending %}
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ br['topic'] }}</h3>
+                    <div class="card-meta">
+                        <span>{{ br['format'] }}</span>
+                        <span>{{ br['constraint_type'] }}</span>
+                        <span>👤 {{ br['owner_handle'] }}</span>
+                        <span>📅 {{ br['created_at'][:10] }}</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    {{ br['content'][:200] }}...
+                </div>
+                <div class="card-actions">
+                    <a href="{{ url_for('bellringers.print_view', bell_ringer_id=br['id']) }}" class="btn btn-primary btn-small" target="_blank">
+                        👁️ View Full
+                    </a>
+                    <button class="btn btn-secondary btn-small" onclick="approveBellRinger({{ br['id'] }}, this)">
+                        ✓ Approve
+                    </button>
+                    <button class="btn btn-danger btn-small" onclick="deleteBellRinger({{ br['id'] }}, this)">
+                        ✗ Delete
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="text-align: center; color: var(--text-light); margin-top: 1rem;">
+            No pending approvals
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- All Public Content -->
+    <div class="card">
+        <h2>✓ Approved Public Content ({{ all_public|length }})</h2>
+
+        {% if all_public %}
+        <div class="card-grid">
+            {% for br in all_public %}
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ br['topic'] }}</h3>
+                    <div class="card-meta">
+                        <span>{{ br['format'] }}</span>
+                        <span>{{ br['constraint_type'] }}</span>
+                        <span>👤 {{ br['owner_handle'] }}</span>
+                        <span>📚 Used by {{ br['binder_count'] }} teachers</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    {{ br['content'][:200] }}...
+                </div>
+                <div class="card-actions">
+                    <a href="{{ url_for('bellringers.print_view', bell_ringer_id=br['id']) }}" class="btn btn-primary btn-small" target="_blank">
+                        👁️ View Full
+                    </a>
+                    <button class="btn btn-danger btn-small" onclick="deleteBellRinger({{ br['id'] }}, this)">
+                        ✗ Delete
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="text-align: center; color: var(--text-light); margin-top: 1rem;">
+            No approved public content yet
+        </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
