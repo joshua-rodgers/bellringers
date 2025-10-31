@@ -52,6 +52,21 @@
             </div>
         </div>
 
+        <!-- Standards Selection (Always Shown) -->
+        <div class="standards-container">
+            <label for="standardSelect" class="standards-label">
+                📋 CS Standard (Optional):
+                <span class="standards-tooltip" title="Align bell ringer with specific CS standards">ⓘ</span>
+            </label>
+            <select class="form-control" id="standardSelect">
+                {% for code, description in standards %}
+                <option value="{{ code }}" {% if code == "None" %}selected{% endif %}>
+                    {{ code }}{% if code != "None" %} - {{ description[:60] }}{% if description|length > 60 %}...{% endif %}{% endif %}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
         <div class="generate-controls">
             <button class="btn btn-secondary" id="spinBtn">🎰 Spin Unlocked</button>
             <button class="btn btn-primary" id="generateBtn">✨ Generate!</button>

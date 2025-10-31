@@ -316,9 +316,117 @@ h3 {
     padding: 1.5rem;
     border-radius: 8px;
     margin-bottom: 1rem;
-    white-space: pre-wrap;
     font-family: 'Georgia', serif;
     line-height: 1.8;
+}
+
+/* ===== Bell Ringer Content Formatting ===== */
+.bell-ringer-content {
+    font-family: 'Georgia', serif;
+    color: var(--text-dark);
+}
+
+.bell-ringer-content h2 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.bell-ringer-content h3 {
+    color: var(--text-dark);
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.bell-ringer-content .section {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--bg-white);
+    border-radius: 6px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.bell-ringer-content .section.instructions {
+    border-left-color: var(--secondary-color);
+}
+
+.bell-ringer-content .section.problem {
+    border-left-color: var(--primary-color);
+}
+
+.bell-ringer-content .section.answer-key {
+    border-left-color: var(--accent-color);
+}
+
+.bell-ringer-content p {
+    margin-bottom: 0.75rem;
+    line-height: 1.8;
+}
+
+.bell-ringer-content pre {
+    background: #2D2D2D;
+    color: #F8F8F2;
+    padding: 1rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.bell-ringer-content code {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.bell-ringer-content pre code {
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    color: inherit;
+}
+
+.bell-ringer-content ul,
+.bell-ringer-content ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.bell-ringer-content li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+/* Standards display */
+.standards-container {
+    margin-bottom: 1.5rem;
+}
+
+.standards-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.standards-tooltip {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background: var(--text-light);
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 0.75rem;
+    line-height: 18px;
+    cursor: help;
 }
 
 .result-actions {
@@ -695,22 +803,192 @@ tbody td::before {
     }
 }
 
-/* ===== Print Styles ===== */
+/* ===== Print Styles (Letter-Sized Paper: 8.5" x 11") ===== */
 @media print {
+    @page {
+        size: letter;
+        margin: 0.5in 0.75in;
+    }
+
+    /* Hide non-essential elements */
     .navbar,
     .footer,
     .btn,
     .card-actions,
-    .nav-menu {
+    .nav-menu,
+    .nav-toggle,
+    .result-actions,
+    .generate-controls,
+    .slot-machine,
+    .generator-container,
+    .lock-btn,
+    .filter-controls,
+    .standards-container {
         display: none !important;
     }
 
+    /* Reset body and containers */
     body {
         background: white;
+        color: black;
+        font-size: 12pt;
+        line-height: 1.5;
+    }
+
+    .main-content {
+        padding: 0;
+        margin: 0;
+    }
+
+    .container {
+        max-width: 100%;
+        margin: 0;
+    }
+
+    /* Result container */
+    .result-container {
+        display: block !important;
+        box-shadow: none;
+        padding: 0;
+        margin: 0;
+        page-break-inside: avoid;
     }
 
     .result-content {
+        background: white;
         box-shadow: none;
-        border: 1px solid #000;
+        padding: 0;
+        margin: 0;
+        border: none;
+    }
+
+    /* Bell ringer content formatting for print */
+    .bell-ringer-content {
+        font-size: 11pt;
+        line-height: 1.6;
+    }
+
+    .bell-ringer-content h2 {
+        font-size: 16pt;
+        color: black;
+        border-bottom: 2px solid black;
+        page-break-after: avoid;
+        margin-top: 0;
+        margin-bottom: 12pt;
+    }
+
+    .bell-ringer-content h3 {
+        font-size: 13pt;
+        color: black;
+        font-weight: bold;
+        page-break-after: avoid;
+        margin-top: 14pt;
+        margin-bottom: 8pt;
+    }
+
+    .bell-ringer-content .section {
+        page-break-inside: avoid;
+        margin-bottom: 14pt;
+        padding: 8pt;
+        border: 1px solid #666;
+        border-left: 4pt solid #333;
+        background: white;
+    }
+
+    .bell-ringer-content p {
+        margin-bottom: 8pt;
+        line-height: 1.6;
+        orphans: 3;
+        widows: 3;
+    }
+
+    /* Code blocks for print */
+    .bell-ringer-content pre {
+        background: #f5f5f5;
+        border: 1px solid #ccc;
+        padding: 8pt;
+        font-size: 9pt;
+        line-height: 1.4;
+        page-break-inside: avoid;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        margin: 10pt 0;
+    }
+
+    .bell-ringer-content code {
+        font-size: 9pt;
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    .bell-ringer-content pre code {
+        background: transparent;
+        color: black;
+    }
+
+    /* Lists */
+    .bell-ringer-content ul,
+    .bell-ringer-content ol {
+        margin-left: 20pt;
+        margin-bottom: 10pt;
+    }
+
+    .bell-ringer-content li {
+        margin-bottom: 6pt;
+        line-height: 1.5;
+        page-break-inside: avoid;
+    }
+
+    /* Cards for print */
+    .card {
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #999;
+        margin-bottom: 12pt;
+    }
+
+    .card-grid {
+        display: block;
+    }
+
+    /* Tables for print */
+    table {
+        page-break-inside: auto;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+
+    th, td {
+        border: 1px solid #666;
+        padding: 6pt;
+        font-size: 10pt;
+    }
+
+    th {
+        background: #e0e0e0;
+        font-weight: bold;
+    }
+
+    /* Prevent page breaks after headings */
+    h1, h2, h3, h4, h5, h6 {
+        page-break-after: avoid;
+    }
+
+    /* Links */
+    a {
+        text-decoration: none;
+        color: black;
+    }
+
+    a[href]:after {
+        content: none;
     }
 }

@@ -5,6 +5,7 @@ from flask import render_template, request, jsonify, session
 import random
 from . import database as db
 from . import gemini_api
+from . import standards as standards_module
 
 
 def register_routes(bp):
@@ -16,13 +17,14 @@ def register_routes(bp):
         return render_template('bellringers/generator.html',
                              topics=gemini_api.get_topic_options(),
                              formats=gemini_api.get_format_options(),
-                             constraints=gemini_api.get_constraint_options())
+                             constraints=gemini_api.get_constraint_options(),
+                             standards=standards_module.get_standards_list())
 
     @bp.route('/api/generate', methods=['POST'])
     def generate():
         """
         Generate a bell ringer based on locked/unlocked slots
-        Expects JSON: {topic, format, constraint, locked_slots: []}
+        Expects JSON: {topic, format, constraint, standard, locked_slots: []}
         """
         data = request.get_json()
         user_handle = session.get('user_handle')
@@ -33,10 +35,11 @@ def register_routes(bp):
         topic = data.get('topic')
         format_type = data.get('format')
         constraint = data.get('constraint')
+        standard_code = data.get('standard', 'None')
 
         # Generate using Gemini API
         try:
-            content = gemini_api.generate_bell_ringer(topic, format_type, constraint)
+            content = gemini_api.generate_bell_ringer(topic, format_type, constraint, standard_code)
 
             # Log the API request
             db.log_activity(user_handle, 'generate', f'{topic} - {format_type} - {constraint}')

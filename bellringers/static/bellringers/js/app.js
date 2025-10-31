@@ -195,8 +195,9 @@ async function generateBellRinger() {
     const topic = document.getElementById('topicSelect').value;
     const format = document.getElementById('formatSelect').value;
     const constraint = document.getElementById('constraintSelect').value;
+    const standard = document.getElementById('standardSelect')?.value || 'None';
 
-    console.log('Generating bell ringer:', { topic, format, constraint });
+    console.log('Generating bell ringer:', { topic, format, constraint, standard });
 
     try {
         const response = await fetch('/bellringers/api/generate', {
@@ -206,7 +207,8 @@ async function generateBellRinger() {
             body: JSON.stringify({
                 topic: topic,
                 format: format,
-                constraint: constraint
+                constraint: constraint,
+                standard: standard
             })
         });
 
@@ -229,7 +231,7 @@ async function generateBellRinger() {
 
         if (data.success) {
             currentGeneration = data;
-            resultContent.textContent = data.content;
+            resultContent.innerHTML = data.content;
             resultContainer.classList.add('active');
             resultContainer.scrollIntoView({ behavior: 'smooth' });
         } else {
