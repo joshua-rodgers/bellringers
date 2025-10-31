@@ -101,6 +101,7 @@ function setupGenerator() {
     const constraintLock = document.getElementById('constraintLock');
     const spinBtn = document.getElementById('spinBtn');
     const generateBtn = document.getElementById('generateBtn');
+    const clearStandardsBtn = document.getElementById('clearStandardsBtn');
 
     if (!topicLock) return; // Not on generator page
 
@@ -114,6 +115,13 @@ function setupGenerator() {
 
     // Generate button handler
     generateBtn.addEventListener('click', generateBellRinger);
+
+    // Clear standards button handler
+    if (clearStandardsBtn) {
+        clearStandardsBtn.addEventListener('click', () => {
+            document.querySelectorAll('.standards-checkbox').forEach(cb => cb.checked = false);
+        });
+    }
 }
 
 function toggleLock(slotName) {
@@ -195,9 +203,12 @@ async function generateBellRinger() {
     const topic = document.getElementById('topicSelect').value;
     const format = document.getElementById('formatSelect').value;
     const constraint = document.getElementById('constraintSelect').value;
-    const standard = document.getElementById('standardSelect')?.value || 'None';
 
-    console.log('Generating bell ringer:', { topic, format, constraint, standard });
+    // Get all checked standards
+    const standardCheckboxes = document.querySelectorAll('.standards-checkbox:checked');
+    const standards = Array.from(standardCheckboxes).map(cb => cb.value);
+
+    console.log('Generating bell ringer:', { topic, format, constraint, standards });
 
     try {
         const response = await fetch('/bellringers/api/generate', {
@@ -208,7 +219,7 @@ async function generateBellRinger() {
                 topic: topic,
                 format: format,
                 constraint: constraint,
-                standard: standard
+                standards: standards
             })
         });
 

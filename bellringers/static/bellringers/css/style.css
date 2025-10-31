@@ -429,6 +429,43 @@ h3 {
     cursor: help;
 }
 
+.standards-checklist {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.5rem;
+    background: var(--bg-white);
+}
+
+.standards-checkbox-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 0.5rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: var(--transition);
+}
+
+.standards-checkbox-item:hover {
+    background: var(--bg-light);
+}
+
+.standards-checkbox {
+    margin-right: 0.5rem;
+    margin-top: 0.25rem;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.standards-checkbox-label {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: var(--text-dark);
+}
+
 .result-actions {
     display: flex;
     flex-direction: column;
@@ -893,6 +930,11 @@ tbody td::before {
         border: 1px solid #666;
         border-left: 4pt solid #333;
         background: white;
+    }
+
+    .bell-ringer-content .section.answer-key {
+        page-break-before: always;
+        margin-top: 0;
     }
 
     .bell-ringer-content p {

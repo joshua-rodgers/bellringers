@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bell Ringer - {{ bell_ringer['topic'] }}</title>
     <style>
+        :root {
+            --primary-color: #4A90E2;
+            --text-dark: #2C3E50;
+            --text-light: #7F8C8D;
+            --bg-white: #FFFFFF;
+            --bg-light: #F8F9FA;
+            --border-color: #DDD;
+        }
+
         body {
             font-family: Georgia, serif;
             line-height: 1.8;
@@ -15,26 +24,96 @@
         }
 
         h1 {
-            color: #2C3E50;
-            border-bottom: 3px solid #4A90E2;
+            color: var(--text-dark);
+            border-bottom: 3px solid var(--primary-color);
             padding-bottom: 0.5rem;
             margin-bottom: 1rem;
         }
 
         .meta {
-            color: #7F8C8D;
+            color: var(--text-light);
             font-size: 0.9rem;
             margin-bottom: 2rem;
             font-family: Arial, sans-serif;
         }
 
         .content {
-            white-space: pre-wrap;
             margin-bottom: 2rem;
         }
 
+        /* Bell ringer content formatting */
+        .bell-ringer-content {
+            font-family: 'Georgia', serif;
+            color: var(--text-dark);
+        }
+
+        .bell-ringer-content h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .bell-ringer-content h3 {
+            color: var(--text-dark);
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .bell-ringer-content .section {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 6px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .bell-ringer-content .section.instructions {
+            border-left-color: #50C878;
+        }
+
+        .bell-ringer-content .section.problem {
+            border-left-color: var(--primary-color);
+        }
+
+        .bell-ringer-content .section.answer-key {
+            border-left-color: #F39C12;
+        }
+
+        .bell-ringer-content p {
+            margin-bottom: 0.75rem;
+            line-height: 1.8;
+        }
+
+        .bell-ringer-content pre {
+            background: #2D2D2D;
+            color: #F8F8F2;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .bell-ringer-content code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .bell-ringer-content pre code {
+            background: none;
+            padding: 0;
+            border-radius: 0;
+            color: inherit;
+        }
+
         .print-btn {
-            background: #4A90E2;
+            background: var(--primary-color);
             color: white;
             border: none;
             padding: 0.75rem 1.5rem;
@@ -48,8 +127,79 @@
             background: #357ABD;
         }
 
+        /* Print-specific styles */
         @media print {
+            @page {
+                size: letter;
+                margin: 0.5in 0.75in;
+            }
+
             .print-btn {
+                display: none;
+            }
+
+            body {
+                padding: 0;
+                margin: 0;
+                font-size: 11pt;
+            }
+
+            h1 {
+                font-size: 16pt;
+                page-break-after: avoid;
+            }
+
+            .bell-ringer-content h2 {
+                font-size: 16pt;
+                color: black;
+                border-bottom: 2px solid black;
+                page-break-after: avoid;
+            }
+
+            .bell-ringer-content h3 {
+                font-size: 13pt;
+                color: black;
+                page-break-after: avoid;
+            }
+
+            .bell-ringer-content .section {
+                page-break-inside: avoid;
+                padding: 8pt;
+                border: 1px solid #666;
+                background: white;
+            }
+
+            .bell-ringer-content .section.answer-key {
+                page-break-before: always;
+                margin-top: 0;
+            }
+
+            .bell-ringer-content pre {
+                background: #f5f5f5;
+                border: 1px solid #ccc;
+                padding: 8pt;
+                font-size: 9pt;
+                page-break-inside: avoid;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+
+            .bell-ringer-content code {
+                font-size: 9pt;
+                color: black;
+            }
+
+            .bell-ringer-content pre code {
+                background: transparent;
+                color: black;
+            }
+
+            .bell-ringer-content p {
+                orphans: 3;
+                widows: 3;
+            }
+
+            hr {
                 display: none;
             }
         }
@@ -65,11 +215,11 @@
         <strong>Constraint:</strong> {{ bell_ringer['constraint_type'] }}
     </div>
 
-    <div class="content">{{ bell_ringer['content'] }}</div>
+    <div class="content">{{ bell_ringer['content']|safe }}</div>
 
     <hr style="margin: 2rem 0; border: 1px solid #ECF0F1;">
 
-    <p style="color: #7F8C8D; font-size: 0.8rem; font-family: Arial, sans-serif;">
+    <p style="color: var(--text-light); font-size: 0.8rem; font-family: Arial, sans-serif;">
         Generated by Bell Ringers | Visit bellringers.app to create your own
     </p>
 </body>
