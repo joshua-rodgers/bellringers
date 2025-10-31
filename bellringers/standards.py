@@ -1,6 +1,9 @@
 """
 Standards management for Bell Ringers
-Reads CS standards from markdown file or uses defaults
+Reads CS standards from markdown file with hierarchical structure:
+- Domains (## Domain X – Name)
+- Standards (### Standard X.Y – Description)
+- Performance Indicators (* **X.Y.Z** Description)
 """
 import os
 import re
@@ -10,11 +13,16 @@ STANDARDS_FILE = os.path.join(os.path.dirname(__file__), 'standards', 'Intro_CS.
 
 
 def parse_standards_from_markdown(file_path):
-    """Parse standards from a markdown file
+    """Parse standards from a markdown file with hierarchical structure
 
     Expected format:
-    ## Standard Code
-    Description of the standard
+    ## Domain X – Domain Name
+    ### Standard X.Y – Standard Description
+    * **X.Y.Z** Performance indicator description
+
+    Returns:
+        Dictionary mapping performance indicator codes to descriptions
+        Format: {"X.Y.Z": "Indicator description"}
     """
     standards = {}
 
@@ -22,65 +30,74 @@ def parse_standards_from_markdown(file_path):
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        # Parse markdown sections
-        # Looking for patterns like "## 1A-AP-10" or "## CS.1.2.3"
-        pattern = r'##\s+([A-Z0-9\.\-]+)\s*\n+(.*?)(?=##|\Z)'
-        matches = re.findall(pattern, content, re.DOTALL)
+        # Split by domains (## Domain X)
+        domain_pattern = r'##\s+Domain\s+(\d+)\s*[–—-]\s*([^\n]+)'
+        domain_sections = re.split(domain_pattern, content)
 
-        for code, description in matches:
-            # Clean up the description
-            description = description.strip()
-            # Take first paragraph as the main description
-            first_para = description.split('\n\n')[0]
-            standards[code.strip()] = first_para.strip()
+        # Process each domain (skipping the preamble)
+        for i in range(1, len(domain_sections), 3):
+            if i + 2 > len(domain_sections):
+                break
+
+            domain_num = domain_sections[i].strip()
+            domain_name = domain_sections[i + 1].strip()
+            domain_content = domain_sections[i + 2]
+
+            # Split by standards (### Standard X.Y)
+            standard_pattern = r'###\s+Standard\s+([\d\.]+)\s*[–—-]\s*([^\n]+)'
+            standard_sections = re.split(standard_pattern, domain_content)
+
+            # Process each standard
+            for j in range(1, len(standard_sections), 3):
+                if j + 2 > len(standard_sections):
+                    break
+
+                standard_num = standard_sections[j].strip()
+                standard_desc = standard_sections[j + 1].strip()
+                standard_content = standard_sections[j + 2]
+
+                # Extract performance indicators (* **X.Y.Z** Description)
+                indicator_pattern = r'\*\s+\*\*([\d\.]+)\*\*\s+([^\n]+)'
+                indicators = re.findall(indicator_pattern, standard_content)
+
+                for indicator_code, indicator_desc in indicators:
+                    # Store with just the indicator description
+                    # (Keep it concise for the dropdown)
+                    standards[indicator_code.strip()] = indicator_desc.strip()
 
     except FileNotFoundError:
+        pass  # Will use defaults
+    except Exception as e:
+        print(f"Error parsing standards file: {e}")
         pass  # Will use defaults
 
     return standards
 
 
 def get_default_standards():
-    """Default CS standards if no file is provided"""
+    """Default standards if no file is provided - sample from Intro CS"""
     return {
         "None": "No specific standard - generate general content",
-        "1A-AP-08": "Model daily processes by creating and following algorithms",
-        "1A-AP-09": "Model the way programs store and manipulate data",
-        "1A-AP-10": "Develop programs with sequences and simple loops",
-        "1A-AP-11": "Decompose tasks into smaller, manageable subtasks",
-        "1A-AP-12": "Develop plans that describe program sequences and events",
-        "1A-AP-14": "Debug errors in an algorithm or program",
-        "1A-AP-15": "Use correct terminology in identifying and describing programs",
-        "1B-AP-08": "Compare and refine multiple algorithms for the same task",
-        "1B-AP-09": "Create programs using compound conditionals and loops",
-        "1B-AP-10": "Create programs using procedures with and without parameters",
-        "1B-AP-11": "Create programs using lists and iteration",
-        "1B-AP-12": "Modify programs to remove errors and add functionality",
-        "1B-AP-15": "Test and refine programs using criteria and design specifications",
-        "1B-AP-16": "Take on roles in teams when developing programs",
-        "2-AP-10": "Use flowcharts or pseudocode to design algorithms",
-        "2-AP-11": "Create procedures with parameters to organize code",
-        "2-AP-12": "Design and develop programs using lists",
-        "2-AP-13": "Decompose problems into smaller components",
-        "2-AP-14": "Create procedures that use APIs or libraries",
-        "2-AP-16": "Incorporate testing throughout program development",
-        "2-AP-17": "Design programs to respond to user events",
-        "2-AP-19": "Document code for readability and maintainability",
-        "3A-AP-13": "Create prototypes that use algorithms to solve problems",
-        "3A-AP-14": "Use lists to simplify solutions to complex problems",
-        "3A-AP-15": "Justify the selection of data structures",
-        "3A-AP-16": "Design and iteratively develop programs with event handlers",
-        "3A-AP-17": "Decompose complex problems into smaller sub-problems",
-        "3A-AP-18": "Create programming artifacts using design processes",
-        "3A-AP-21": "Evaluate and refine computational artifacts",
-        "3B-AP-08": "Describe how artificial intelligence drives applications",
-        "3B-AP-09": "Implement an AI algorithm to address a problem",
-        "3B-AP-10": "Use and adapt classic algorithms",
-        "3B-AP-11": "Evaluate algorithms in terms of efficiency and correctness",
-        "3B-AP-14": "Construct solutions using procedural abstraction",
-        "3B-AP-16": "Demonstrate code reuse by creating libraries",
-        "3B-AP-21": "Develop programs for multiple platforms",
-        "3B-AP-22": "Evaluate computational solutions for impacts",
+        "1.1.1": "Demonstrate understanding of various career paths in computer science",
+        "2.1.1": "Recognize situations where computational approaches would be beneficial",
+        "2.1.2": "Apply computational thinking principles to problem-solving",
+        "2.2.1": "Use various data types appropriately within a program",
+        "2.2.2": "Create and use variables to store and manage data",
+        "2.2.6": "Implement data structures to organize and manipulate collections",
+        "2.3.1": "Analyze a program in terms of execution steps and expected outcomes",
+        "2.3.4": "Create programs with selection control structures",
+        "2.3.5": "Create programs with iteration control structures",
+        "2.3.6": "Create subroutines for code modularity and reusability",
+        "2.3.7": "Debug errors to ensure functionality",
+        "2.4.1": "Use the console for basic data input/output operations",
+        "2.5.1": "Implement consistent formatting and naming conventions",
+        "3.1.1": "Categorize data into quantitative and qualitative types",
+        "3.2.2": "Analyze data using descriptive statistics and visualizations",
+        "4.1.1": "Define artificial intelligence and identify key subfields",
+        "5.1.1": "Analyze core information security principles",
+        "5.1.2": "Describe common cyber threats",
+        "5.2.1": "Identify key hardware components and their roles",
+        "5.3.1": "Define network concepts",
     }
 
 
@@ -92,6 +109,9 @@ def get_standards():
     # If no standards loaded from file, use defaults
     if not standards:
         standards = get_default_standards()
+    else:
+        # Add "None" option to parsed standards
+        standards = {"None": "No specific standard - generate general content", **standards}
 
     return standards
 
@@ -103,6 +123,23 @@ def get_standard_description(code):
 
 
 def get_standards_list():
-    """Get list of (code, description) tuples for dropdown"""
+    """Get list of (code, description) tuples for dropdown
+
+    Returns sorted list with "None" first, then numerically sorted indicators
+    """
     standards = get_standards()
-    return sorted(standards.items(), key=lambda x: (x[0] != "None", x[0]))
+
+    def sort_key(item):
+        code = item[0]
+        # "None" comes first
+        if code == "None":
+            return (0, [])
+        # Parse numeric codes like "2.3.7" and sort numerically
+        try:
+            parts = [int(x) for x in code.split('.')]
+            return (1, parts)
+        except (ValueError, AttributeError):
+            # Fallback for non-numeric codes
+            return (2, [0])
+
+    return sorted(standards.items(), key=sort_key)
