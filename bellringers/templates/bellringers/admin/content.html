@@ -30,7 +30,7 @@
                     </div>
                 </div>
                 <div class="card-content">
-                    {{ br['content'][:200] }}...
+                    {{ br['content']|striptags|truncate(200) }}
                 </div>
                 <div class="card-actions">
                     <a href="{{ url_for('bellringers.print_view', bell_ringer_id=br['id']) }}" class="btn btn-primary btn-small" target="_blank">
@@ -71,7 +71,7 @@
                     </div>
                 </div>
                 <div class="card-content">
-                    {{ br['content'][:200] }}...
+                    {{ br['content']|striptags|truncate(200) }}
                 </div>
                 <div class="card-actions">
                     <a href="{{ url_for('bellringers.print_view', bell_ringer_id=br['id']) }}" class="btn btn-primary btn-small" target="_blank">

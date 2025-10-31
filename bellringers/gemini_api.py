@@ -14,7 +14,7 @@ def configure_gemini():
     genai.configure(api_key=api_key)
 
 
-def generate_bell_ringer(topic, format_type, constraint, standard_code="None"):
+def generate_bell_ringer(topic, format_type, constraint, standard_codes=[]):
     """
     Generate a bell ringer using Gemini 2.0 Flash model
 
@@ -22,7 +22,7 @@ def generate_bell_ringer(topic, format_type, constraint, standard_code="None"):
         topic: CS topic (e.g., Variables, Loops, Data Structures)
         format_type: Question format (e.g., Debug the Code, Predict Output)
         constraint: Teaching constraint (e.g., 5-Minute Timer, AP-Level Review)
-        standard_code: Optional CS standard code to align with
+        standard_codes: List of CS standard codes to align with
 
     Returns:
         Generated bell ringer content as formatted HTML
@@ -32,11 +32,14 @@ def generate_bell_ringer(topic, format_type, constraint, standard_code="None"):
     # Use the gemini-2.0-flash model
     model = genai.GenerativeModel('gemini-2.0-flash-exp')
 
-    # Get standard description if provided
+    # Get standard descriptions if provided
     standard_text = ""
-    if standard_code and standard_code != "None":
-        standard_desc = standards_module.get_standard_description(standard_code)
-        standard_text = f"\n- **Standard**: {standard_code} - {standard_desc}"
+    if standard_codes and len(standard_codes) > 0:
+        standards_list = []
+        for code in standard_codes:
+            standard_desc = standards_module.get_standard_description(code)
+            standards_list.append(f"{code} - {standard_desc}")
+        standard_text = "\n- **Standards**: " + "; ".join(standards_list)
 
     # Craft a detailed prompt for the specific combination
     prompt = f"""You are an expert Computer Science teacher creating a high-quality bell ringer (warm-up exercise) for a CS class.
@@ -52,7 +55,7 @@ Requirements:
 3. For code-based questions, use Python unless otherwise appropriate
 4. Make it engaging and appropriate for the constraint level
 5. Include an answer key or expected output at the end
-6. {"Align the content with the specified standard" if standard_code != "None" else ""}
+6. {"Align the content with the specified standards" if standard_codes else ""}
 
 Format your response as HTML with these exact sections:
 <div class="bell-ringer-content">
@@ -90,6 +93,10 @@ IMPORTANT:
         # Clean up any markdown that might have slipped through
         content = content.replace('```python', '<pre><code class="language-python">')
         content = content.replace('```', '</code></pre>')
+
+        # Remove any 'html' or '```html' tags that Gemini might add
+        content = content.replace('```html', '').replace('```', '')
+        content = content.strip()
 
         # Ensure content starts and ends cleanly
         if '<div class="bell-ringer-content">' not in content:

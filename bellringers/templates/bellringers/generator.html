@@ -52,19 +52,25 @@
             </div>
         </div>
 
-        <!-- Standards Selection (Always Shown) -->
+        <!-- Standards Selection (Multi-Select Checklist) -->
         <div class="standards-container">
-            <label for="standardSelect" class="standards-label">
-                📋 CS Standard (Optional):
+            <label class="standards-label">
+                📋 CS Standards (Select multiple):
                 <span class="standards-tooltip" title="Align bell ringer with specific CS standards">ⓘ</span>
             </label>
-            <select class="form-control" id="standardSelect">
+            <div class="standards-checklist" id="standardsChecklist">
                 {% for code, description in standards %}
-                <option value="{{ code }}" {% if code == "None" %}selected{% endif %}>
-                    {{ code }}{% if code != "None" %} - {{ description[:60] }}{% if description|length > 60 %}...{% endif %}{% endif %}
-                </option>
+                {% if code != "None" %}
+                <label class="standards-checkbox-item">
+                    <input type="checkbox" name="standards" value="{{ code }}" class="standards-checkbox">
+                    <span class="standards-checkbox-label">
+                        <strong>{{ code }}</strong> - {{ description[:60] }}{% if description|length > 60 %}...{% endif %}
+                    </span>
+                </label>
+                {% endif %}
                 {% endfor %}
-            </select>
+            </div>
+            <button type="button" class="btn btn-small" id="clearStandardsBtn" style="margin-top: 0.5rem;">Clear All</button>
         </div>
 
         <div class="generate-controls">
