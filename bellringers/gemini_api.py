@@ -3,6 +3,7 @@ Google Gemini API integration for generating bell ringers
 """
 import os
 import google.generativeai as genai
+from . import standards as standards_module
 
 
 def configure_gemini():
@@ -13,7 +14,7 @@ def configure_gemini():
     genai.configure(api_key=api_key)
 
 
-def generate_bell_ringer(topic, format_type, constraint):
+def generate_bell_ringer(topic, format_type, constraint, standard_code="None"):
     """
     Generate a bell ringer using Gemini 2.0 Flash model
 
@@ -21,14 +22,21 @@ def generate_bell_ringer(topic, format_type, constraint):
         topic: CS topic (e.g., Variables, Loops, Data Structures)
         format_type: Question format (e.g., Debug the Code, Predict Output)
         constraint: Teaching constraint (e.g., 5-Minute Timer, AP-Level Review)
+        standard_code: Optional CS standard code to align with
 
     Returns:
-        Generated bell ringer content as formatted text
+        Generated bell ringer content as formatted HTML
     """
     configure_gemini()
 
     # Use the gemini-2.0-flash model
     model = genai.GenerativeModel('gemini-2.0-flash-exp')
+
+    # Get standard description if provided
+    standard_text = ""
+    if standard_code and standard_code != "None":
+        standard_desc = standards_module.get_standard_description(standard_code)
+        standard_text = f"\n- **Standard**: {standard_code} - {standard_desc}"
 
     # Craft a detailed prompt for the specific combination
     prompt = f"""You are an expert Computer Science teacher creating a high-quality bell ringer (warm-up exercise) for a CS class.
@@ -36,7 +44,7 @@ def generate_bell_ringer(topic, format_type, constraint):
 Generate a bell ringer with these specifications:
 - **Topic**: {topic}
 - **Format**: {format_type}
-- **Constraint**: {constraint}
+- **Constraint**: {constraint}{standard_text}
 
 Requirements:
 1. The activity should be completable within 5-10 minutes
@@ -44,26 +52,53 @@ Requirements:
 3. For code-based questions, use Python unless otherwise appropriate
 4. Make it engaging and appropriate for the constraint level
 5. Include an answer key or expected output at the end
+6. {"Align the content with the specified standard" if standard_code != "None" else ""}
 
-Format your response as:
-# Bell Ringer: {topic}
+Format your response as HTML with these exact sections:
+<div class="bell-ringer-content">
+    <h2>Bell Ringer: {topic}</h2>
 
-## Instructions
-[Clear student-facing instructions]
+    <div class="section instructions">
+        <h3>Instructions</h3>
+        <p>[Clear, concise student-facing instructions]</p>
+    </div>
 
-## Problem
-[The actual problem/exercise]
+    <div class="section problem">
+        <h3>Problem</h3>
+        <p>[The problem description]</p>
+        <pre><code>[Any code snippets here - properly formatted]</code></pre>
+    </div>
 
-## Answer Key
-[Solution or expected output]
+    <div class="section answer-key">
+        <h3>Answer Key</h3>
+        <p>[Explanation of solution]</p>
+        <pre><code>[Solution code if applicable]</code></pre>
+    </div>
+</div>
 
-Make this pedagogically sound and immediately printable."""
+IMPORTANT:
+- Wrap ALL code in <pre><code> tags
+- Keep content concise for printing on letter-sized paper
+- Use proper HTML paragraphs and formatting
+- Do NOT include any markdown formatting
+- Only include the <div class="bell-ringer-content"> and its contents, no other HTML wrapper"""
 
     try:
         response = model.generate_content(prompt)
-        return response.text
+        content = response.text
+
+        # Clean up any markdown that might have slipped through
+        content = content.replace('```python', '<pre><code class="language-python">')
+        content = content.replace('```', '</code></pre>')
+
+        # Ensure content starts and ends cleanly
+        if '<div class="bell-ringer-content">' not in content:
+            # Model didn't follow format, wrap it
+            content = f'<div class="bell-ringer-content">{content}</div>'
+
+        return content
     except Exception as e:
-        return f"Error generating bell ringer: {str(e)}"
+        return f'<div class="bell-ringer-content"><div class="error">Error generating bell ringer: {str(e)}</div></div>'
 
 
 def get_topic_options():
