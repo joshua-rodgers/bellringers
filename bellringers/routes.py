@@ -23,8 +23,8 @@ def register_routes(bp):
     @bp.route('/api/generate', methods=['POST'])
     def generate():
         """
-        Generate a bell ringer based on locked/unlocked slots
-        Expects JSON: {topic, format, constraint, standards: [], locked_slots: []}
+        Generate a bell ringer based on parameters
+        Expects JSON: {topic, format, constraint, prompt, standards: []}
         """
         data = request.get_json()
         user_handle = session.get('user_handle')
@@ -35,11 +35,12 @@ def register_routes(bp):
         topic = data.get('topic')
         format_type = data.get('format')
         constraint = data.get('constraint')
+        prompt = data.get('prompt', '')
         standard_codes = data.get('standards', [])
 
         # Generate using Gemini API
         try:
-            content = gemini_api.generate_bell_ringer(topic, format_type, constraint, standard_codes)
+            content = gemini_api.generate_bell_ringer(topic, format_type, constraint, standard_codes, prompt)
 
             # Log the API request
             db.log_activity(user_handle, 'generate', f'{topic} - {format_type} - {constraint}')

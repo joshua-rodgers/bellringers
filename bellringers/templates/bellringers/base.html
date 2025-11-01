@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Bell Ringers - CS Warm-Up Generator{% endblock %}</title>
+    <title>{% block title %}quickwork - Bell Ringers on Demand{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('bellringers.static', filename='bellringers/css/style.css') }}">
     {% block extra_css %}{% endblock %}
 </head>
@@ -11,7 +11,7 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-brand">
-                <a href="{{ url_for('bellringers.index') }}">🔔 Bell Ringers</a>
+                <a href="{{ url_for('bellringers.index') }}">quickwork</a>
             </div>
 
             <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
@@ -35,7 +35,7 @@
     </main>
 
     <footer class="footer">
-        <p>&copy; 2025 Bell Ringers | Built for CS Teachers</p>
+        <p>&copy; 2025 quickwork | CS Bell Ringers on Demand</p>
     </footer>
 
     <script src="{{ url_for('bellringers.static', filename='bellringers/js/app.js') }}"></script>
