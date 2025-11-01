@@ -14,7 +14,7 @@ def configure_gemini():
     genai.configure(api_key=api_key)
 
 
-def generate_bell_ringer(topic, format_type, constraint, standard_codes=[]):
+def generate_bell_ringer(topic, format_type, constraint, standard_codes=[], user_prompt=""):
     """
     Generate a bell ringer using Gemini 2.0 Flash model
 
@@ -23,6 +23,7 @@ def generate_bell_ringer(topic, format_type, constraint, standard_codes=[]):
         format_type: Question format (e.g., Debug the Code, Predict Output)
         constraint: Teaching constraint (e.g., 5-Minute Timer, AP-Level Review)
         standard_codes: List of CS standard codes to align with
+        user_prompt: Optional user-provided keyword or phrase to customize content
 
     Returns:
         Generated bell ringer content as formatted HTML
@@ -41,13 +42,18 @@ def generate_bell_ringer(topic, format_type, constraint, standard_codes=[]):
             standards_list.append(f"{code} - {standard_desc}")
         standard_text = "\n- **Standards**: " + "; ".join(standards_list)
 
+    # Add prompt context if provided
+    prompt_text = ""
+    if user_prompt:
+        prompt_text = f"\n- **User Focus**: Incorporate or relate to: {user_prompt}"
+
     # Craft a detailed prompt for the specific combination
-    prompt = f"""You are an expert Computer Science teacher creating a high-quality bell ringer (warm-up exercise) for a CS class.
+    ai_prompt = f"""You are an expert Computer Science teacher creating a high-quality bell ringer (warm-up exercise) for a CS class.
 
 Generate a bell ringer with these specifications:
 - **Topic**: {topic}
 - **Format**: {format_type}
-- **Constraint**: {constraint}{standard_text}
+- **Constraint**: {constraint}{standard_text}{prompt_text}
 
 Requirements:
 1. The activity should be completable within 5-10 minutes
@@ -87,7 +93,7 @@ IMPORTANT:
 - Only include the <div class="bell-ringer-content"> and its contents, no other HTML wrapper"""
 
     try:
-        response = model.generate_content(prompt)
+        response = model.generate_content(ai_prompt)
         content = response.text
 
         # Clean up any markdown that might have slipped through

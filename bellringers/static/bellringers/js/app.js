@@ -1,6 +1,6 @@
 /**
- * Bell Ringers - Main JavaScript
- * Handles user sessions, API calls, and UI interactions
+ * QuickWork - Bell Ringers
+ * Modern dark theme with prompt-based generation
  */
 
 // ===== User Handle Management =====
@@ -34,8 +34,7 @@ async function getUserHandle() {
         console.log('Found existing handle:', handle);
     }
 
-    // ALWAYS register/update session on backend, even if handle exists
-    // This ensures session is created if cookies were cleared
+    // ALWAYS register/update session on backend
     console.log('Registering session for:', handle);
     try {
         const response = await fetch('/bellringers/api/register', {
@@ -94,24 +93,33 @@ let lockedSlots = {
 };
 
 let currentGeneration = null;
+let advancedOptionsVisible = false;
 
 function setupGenerator() {
     const topicLock = document.getElementById('topicLock');
     const formatLock = document.getElementById('formatLock');
     const constraintLock = document.getElementById('constraintLock');
-    const spinBtn = document.getElementById('spinBtn');
     const generateBtn = document.getElementById('generateBtn');
+    const randomizeBtn = document.getElementById('randomizeBtn');
+    const advancedToggleBtn = document.getElementById('advancedToggleBtn');
     const clearStandardsBtn = document.getElementById('clearStandardsBtn');
 
     if (!topicLock) return; // Not on generator page
+
+    // Advanced options toggle
+    if (advancedToggleBtn) {
+        advancedToggleBtn.addEventListener('click', toggleAdvancedOptions);
+    }
 
     // Lock button handlers
     topicLock.addEventListener('click', () => toggleLock('topic'));
     formatLock.addEventListener('click', () => toggleLock('format'));
     constraintLock.addEventListener('click', () => toggleLock('constraint'));
 
-    // Spin button handler
-    spinBtn.addEventListener('click', spinSlots);
+    // Randomize button handler
+    if (randomizeBtn) {
+        randomizeBtn.addEventListener('click', randomizeUnlocked);
+    }
 
     // Generate button handler
     generateBtn.addEventListener('click', generateBellRinger);
@@ -122,73 +130,59 @@ function setupGenerator() {
             document.querySelectorAll('.standards-checkbox').forEach(cb => cb.checked = false);
         });
     }
+
+    // Initialize with random values
+    randomizeUnlocked();
+}
+
+function toggleAdvancedOptions() {
+    const advancedOptions = document.getElementById('advancedOptions');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    advancedOptionsVisible = !advancedOptionsVisible;
+
+    if (advancedOptionsVisible) {
+        advancedOptions.classList.add('show');
+        toggleIcon.textContent = '∧'; // Up arrow
+    } else {
+        advancedOptions.classList.remove('show');
+        toggleIcon.textContent = '∨'; // Down arrow
+    }
 }
 
 function toggleLock(slotName) {
     lockedSlots[slotName] = !lockedSlots[slotName];
     const lockBtn = document.getElementById(`${slotName}Lock`);
-    const slot = document.getElementById(`${slotName}Slot`);
+    const item = document.getElementById(`${slotName}Item`);
 
     if (lockedSlots[slotName]) {
         lockBtn.textContent = '🔒';
-        slot.classList.add('locked');
+        item.classList.add('locked');
     } else {
         lockBtn.textContent = '🔓';
-        slot.classList.remove('locked');
+        item.classList.remove('locked');
     }
 }
 
-async function spinSlots() {
-    const spinBtn = document.getElementById('spinBtn');
-    spinBtn.disabled = true;
-    spinBtn.textContent = '🎰 Spinning...';
+function randomizeUnlocked() {
+    const topicSelect = document.getElementById('topicSelect');
+    const formatSelect = document.getElementById('formatSelect');
+    const constraintSelect = document.getElementById('constraintSelect');
 
-    // Visual spinning animation
-    const slots = ['topic', 'format', 'constraint'];
-    slots.forEach(slot => {
-        if (!lockedSlots[slot]) {
-            const select = document.getElementById(`${slot}Select`);
-            select.classList.add('spinning');
-        }
-    });
+    // Randomize unlocked dropdowns
+    if (!lockedSlots.topic) {
+        const randomTopic = Math.floor(Math.random() * topicSelect.options.length);
+        topicSelect.selectedIndex = randomTopic;
+    }
 
-    try {
-        const response = await fetch('/bellringers/api/spin', {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ locked: lockedSlots })
-        });
+    if (!lockedSlots.format) {
+        const randomFormat = Math.floor(Math.random() * formatSelect.options.length);
+        formatSelect.selectedIndex = randomFormat;
+    }
 
-        const data = await response.json();
-
-        // Update unlocked slots with new values
-        setTimeout(() => {
-            if (data.topic) {
-                document.getElementById('topicSelect').value = data.topic;
-            }
-            if (data.format) {
-                document.getElementById('formatSelect').value = data.format;
-            }
-            if (data.constraint) {
-                document.getElementById('constraintSelect').value = data.constraint;
-            }
-
-            // Remove spinning animation
-            slots.forEach(slot => {
-                const select = document.getElementById(`${slot}Select`);
-                select.classList.remove('spinning');
-            });
-
-            spinBtn.disabled = false;
-            spinBtn.textContent = '🎰 Spin Unlocked';
-        }, 500);
-
-    } catch (error) {
-        console.error('Spin error:', error);
-        alert('Error spinning slots');
-        spinBtn.disabled = false;
-        spinBtn.textContent = '🎰 Spin Unlocked';
+    if (!lockedSlots.constraint) {
+        const randomConstraint = Math.floor(Math.random() * constraintSelect.options.length);
+        constraintSelect.selectedIndex = randomConstraint;
     }
 }
 
@@ -196,19 +190,26 @@ async function generateBellRinger() {
     const generateBtn = document.getElementById('generateBtn');
     const resultContainer = document.getElementById('resultContainer');
     const resultContent = document.getElementById('resultContent');
+    const promptInput = document.getElementById('promptInput');
 
     generateBtn.disabled = true;
     generateBtn.innerHTML = '<span class="spinner"></span> Generating...';
 
+    // If advanced options are hidden, randomize everything
+    if (!advancedOptionsVisible) {
+        randomizeUnlocked();
+    }
+
     const topic = document.getElementById('topicSelect').value;
     const format = document.getElementById('formatSelect').value;
     const constraint = document.getElementById('constraintSelect').value;
+    const prompt = promptInput.value.trim();
 
     // Get all checked standards
     const standardCheckboxes = document.querySelectorAll('.standards-checkbox:checked');
     const standards = Array.from(standardCheckboxes).map(cb => cb.value);
 
-    console.log('Generating bell ringer:', { topic, format, constraint, standards });
+    console.log('Generating bell ringer:', { topic, format, constraint, prompt, standards });
 
     try {
         const response = await fetch('/bellringers/api/generate', {
@@ -219,6 +220,7 @@ async function generateBellRinger() {
                 topic: topic,
                 format: format,
                 constraint: constraint,
+                prompt: prompt,
                 standards: standards
             })
         });
@@ -230,7 +232,6 @@ async function generateBellRinger() {
                 const errorMsg = 'Session expired or not found. Reloading page to create new session...';
                 console.error(errorMsg);
                 alert(errorMsg);
-                // Reload page to re-establish session
                 setTimeout(() => location.reload(), 1000);
                 return;
             }
@@ -254,7 +255,7 @@ async function generateBellRinger() {
         alert('Error generating bell ringer: ' + error.message);
     } finally {
         generateBtn.disabled = false;
-        generateBtn.textContent = '✨ Generate!';
+        generateBtn.textContent = 'Generate';
     }
 }
 
@@ -336,11 +337,16 @@ function printBellRinger() {
                     padding: 1in;
                 }
                 h1 { color: #333; }
-                pre { white-space: pre-wrap; }
+                pre {
+                    white-space: pre-wrap;
+                    background: #f5f5f5;
+                    padding: 1rem;
+                    border-radius: 4px;
+                }
             </style>
         </head>
         <body>
-            <pre>${currentGeneration.content}</pre>
+            ${currentGeneration.content}
         </body>
         </html>
     `);
@@ -398,7 +404,7 @@ async function adminLogin(event) {
         const data = await response.json();
 
         if (data.success) {
-            window.location.href = '/admin/dashboard';
+            window.location.href = '/bellringers/admin/dashboard';
         } else {
             showAlert('Invalid credentials', 'error');
         }

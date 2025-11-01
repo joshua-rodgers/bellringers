@@ -1,61 +1,80 @@
 {% extends "bellringers/base.html" %}
 
-{% block title %}Generator - Bell Ringers{% endblock %}
+{% block title %}QuickWork - Bell Ringers on Demand{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h1>🎰 Bell Ringer Generator</h1>
-    <p style="color: var(--text-light); margin-bottom: 2rem;">
-        Lock the slots you want to keep, spin the rest, and generate a unique CS warm-up!
-    </p>
-
-    <!-- Lock & Spin UI -->
     <div class="generator-container">
-        <div class="slot-machine">
-            <!-- Topic Slot -->
-            <div class="slot" id="topicSlot">
-                <div class="slot-header">
-                    <span class="slot-label">📚 Topic</span>
-                    <button class="lock-btn" id="topicLock">🔓</button>
-                </div>
-                <select class="slot-select" id="topicSelect">
-                    {% for topic in topics %}
-                    <option value="{{ topic }}">{{ topic }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Format Slot -->
-            <div class="slot" id="formatSlot">
-                <div class="slot-header">
-                    <span class="slot-label">📝 Format</span>
-                    <button class="lock-btn" id="formatLock">🔓</button>
-                </div>
-                <select class="slot-select" id="formatSelect">
-                    {% for format in formats %}
-                    <option value="{{ format }}">{{ format }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Constraint Slot -->
-            <div class="slot" id="constraintSlot">
-                <div class="slot-header">
-                    <span class="slot-label">⚡ Constraint</span>
-                    <button class="lock-btn" id="constraintLock">🔓</button>
-                </div>
-                <select class="slot-select" id="constraintSelect">
-                    {% for constraint in constraints %}
-                    <option value="{{ constraint }}">{{ constraint }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <p class="tagline">Bell ringers on demand. No fluff.</p>
         </div>
 
-        <!-- Standards Selection (Multi-Select Checklist) -->
+        <!-- Prompt Input -->
+        <div class="prompt-input-container">
+            <input
+                type="text"
+                id="promptInput"
+                class="prompt-input"
+                placeholder="Enter a word or phrase 50 chars or less."
+                maxlength="50"
+            >
+        </div>
+
+        <!-- Main Controls -->
+        <div class="main-controls">
+            <button class="btn btn-primary" id="generateBtn">Generate</button>
+            <button class="btn-icon advanced-toggle" id="advancedToggleBtn" title="Show/hide advanced options">
+                <span id="toggleIcon">∨</span>
+            </button>
+        </div>
+
+        <!-- Advanced Options (Collapsible) -->
+        <div class="advanced-options" id="advancedOptions">
+            <!-- Topic Dropdown -->
+            <div class="dropdown-item" id="topicItem">
+                <div class="dropdown-wrapper">
+                    <select class="dropdown-select" id="topicSelect">
+                        {% for topic in topics %}
+                        <option value="{{ topic }}">{{ topic }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn-icon lock-btn" id="topicLock" title="Lock/unlock topic">🔓</button>
+                </div>
+            </div>
+
+            <!-- Format Dropdown -->
+            <div class="dropdown-item" id="formatItem">
+                <div class="dropdown-wrapper">
+                    <select class="dropdown-select" id="formatSelect">
+                        {% for format in formats %}
+                        <option value="{{ format }}">{{ format }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn-icon lock-btn" id="formatLock" title="Lock/unlock format">🔓</button>
+                </div>
+            </div>
+
+            <!-- Constraint Dropdown -->
+            <div class="dropdown-item" id="constraintItem">
+                <div class="dropdown-wrapper">
+                    <select class="dropdown-select" id="constraintSelect">
+                        {% for constraint in constraints %}
+                        <option value="{{ constraint }}">{{ constraint }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn-icon lock-btn" id="constraintLock" title="Lock/unlock constraint">🔓</button>
+                </div>
+            </div>
+
+            <!-- Randomize Button -->
+            <button class="btn btn-primary randomize-btn" id="randomizeBtn">Randomize</button>
+        </div>
+
+        <!-- Standards Selection -->
         <div class="standards-container">
             <label class="standards-label">
-                📋 CS Standards (Select multiple):
+                📋 CS Standards (Optional):
                 <span class="standards-tooltip" title="Align bell ringer with specific CS standards">ⓘ</span>
             </label>
             <div class="standards-checklist" id="standardsChecklist">
@@ -70,12 +89,7 @@
                 {% endif %}
                 {% endfor %}
             </div>
-            <button type="button" class="btn btn-small" id="clearStandardsBtn" style="margin-top: 0.5rem;">Clear All</button>
-        </div>
-
-        <div class="generate-controls">
-            <button class="btn btn-secondary" id="spinBtn">🎰 Spin Unlocked</button>
-            <button class="btn btn-primary" id="generateBtn">✨ Generate!</button>
+            <button type="button" class="btn btn-small btn-secondary" id="clearStandardsBtn">Clear All</button>
         </div>
     </div>
 
@@ -92,13 +106,14 @@
     </div>
 
     <!-- Instructions -->
-    <div class="card" style="margin-top: 2rem;">
+    <div class="card" style="margin-top: 3rem;">
         <h3>How to Use</h3>
         <ol>
-            <li><strong>Lock</strong> any slot you want to keep (🔒)</li>
-            <li><strong>Spin</strong> to randomize unlocked slots</li>
-            <li><strong>Generate</strong> your bell ringer using AI</li>
-            <li><strong>Save</strong> to your private binder or <strong>Publish</strong> to share with others</li>
+            <li><strong>Quick Generate:</strong> Enter a topic or keyword and click Generate</li>
+            <li><strong>Customize:</strong> Click the ∨ button to reveal advanced options</li>
+            <li><strong>Lock & Randomize:</strong> Lock specific options and randomize the rest</li>
+            <li><strong>Align Standards:</strong> Select CS standards to align with your curriculum</li>
+            <li><strong>Save or Share:</strong> Save to your private binder or publish to the community feed</li>
         </ol>
     </div>
 </div>
